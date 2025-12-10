@@ -147,7 +147,7 @@ jobs:
       #     path: gh
 
       - name: Install SSH key
-        uses: ./actions/.github/actions/ssh-agent
+        uses: ./.github/actions/ssh-agent
         with:
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           ssh_url: ${{ env.DOTENV_DESTINATION_REPOSITORY }}
