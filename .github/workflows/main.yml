@@ -98,10 +98,10 @@ jobs:
         continue-on-error: true
         run: composer install --prefer-dist --no-progress --no-dev -o -n
 
-      # - name: Install node dependencies and build.
-      #   run: |
-      #     composer npm-install
-      #     composer build-theme
+      - name: Install node dependencies and build.
+        run: |
+          composer npm-install
+          composer build-theme
 
       # - name: Clean project.
       #   run: |
