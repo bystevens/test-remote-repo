@@ -15,7 +15,7 @@ env:
   NODE_VERSION: '22'
   THEME_PATH: './docroot/themes/custom/kinetic'
   WEBROOT: './docroot'
-  DESTINATION_REPOSITORY: 'https://github.com/bystevens/test-remote-repo.git'
+  DESTINATION_REPOSITORY: 'git@github.com:bystevens/test-remote-repo.git'
 
 jobs:
   # test:
@@ -103,10 +103,10 @@ jobs:
           composer npm-install
           composer build-theme
 
-      # - name: Clean project.
-      #   run: |
-      #     rm -rf ${{ env.THEME_PATH }}/node_modules
-      #     rm -rf .editorconfig .github .git .gitattributes .gitignore .ddev
+      - name: Clean project.
+        run: |
+          rm -rf ${{ env.THEME_PATH }}/node_modules
+          rm -rf .editorconfig .github .git .gitattributes .gitignore .ddev
 
       - name: Generate Deployment Artifact
         run: |
@@ -148,7 +148,7 @@ jobs:
         uses: ./.github/actions/ssh-agent
         with:
           private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh_url: ${{ env.DOTENV_DESTINATION_REPOSITORY }}
+          ssh_url: ${{ env.DESTINATION_REPOSITORY }}
         env:
           SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
 
