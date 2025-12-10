@@ -82,21 +82,21 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ${{ env.THEME_PATH }}/package-lock.json
 
-      # - name: Get composer cache directory
-      #   id: composer-cache
-      #   run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      # - name: Cache composer dependencies
-      #   if: ${{ !env.ACT }}
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ${{ steps.composer-cache.outputs.dir }}
-      #     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-      #     restore-keys: ${{ runner.os }}-composer-
+      - name: Cache composer dependencies
+        if: ${{ !env.ACT }}
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
-      # - name: Install composer dependencies.
-      #   continue-on-error: true
-      #   run: composer install --prefer-dist --no-progress --no-dev -o -n
+      - name: Install composer dependencies.
+        continue-on-error: true
+        run: composer install --prefer-dist --no-progress --no-dev -o -n
 
       - name: Install node dependencies and build.
         run: |
@@ -166,7 +166,6 @@ jobs:
   #         git clean -fxd
 
       - name: Download deploy artifact
-        if: ${{ !env.ACT }}
         uses: actions/download-artifact@v4
         with:
           name: deploy-artifact
@@ -207,10 +206,10 @@ jobs:
         if: github.ref_type == 'branch'
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          git push origin main:$DESTINATION_REPOSITORY_BRANCH
+          git push origin main:${DESTINATION_REPOSITORY_BRANCH} --force
 
       - name: Push the tag to the destination repository
         if: github.ref_type == 'tag'
         run: |
           git fetch --tags
-          git push -u origin tags/$DESTINATION_REPOSITORY_BRANCH
+          git push -u origin tags/${DESTINATION_REPOSITORY_BRANCH} --force
