@@ -106,12 +106,10 @@ jobs:
       - name: Clean project.
         run: |
           rm -rf ${{ env.THEME_PATH }}/node_modules
-          rm -rf .editorconfig .github .git .gitattributes .gitignore .ddev
 
       - name: Generate Deployment Artifact
         run: |
           mkdir -p /tmp/deploy-artifact
-          ls -la $GITHUB_WORKSPACE
           mv $GITHUB_WORKSPACE/{.[!.],}* /tmp/deploy-artifact/
           tar -czf deploy-artifact.tar.gz -C /tmp deploy-artifact
           mkdir -p artifacts
@@ -196,6 +194,7 @@ jobs:
       - name: Configure Remote Repository
         working-directory: ${{ runner.temp }}
         run: |
+          ls -la .
           git init
           git remote add origin "${{ env.DESTINATION_REPOSITORY }}"
           git remote -v
