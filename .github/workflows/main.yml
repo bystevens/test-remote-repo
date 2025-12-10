@@ -176,7 +176,7 @@ jobs:
         run: |
           tar -xf ${{ runner.temp }}/deploy-artifact.tar.gz -C ${{ github.workspace }}
 
-      - name: Configure git user
+      - name: Configure Global Git settings
         run: |
           git config --global user.name $USER_NAME
           git config --global user.email $USER_EMAIL
@@ -197,7 +197,7 @@ jobs:
         run: |
           ls -la .
           git init
-          git remote add origin "${{ env.DESTINATION_REPOSITORY }}"
+          git remote set-url origin "${{ env.DESTINATION_REPOSITORY }}"
           git remote -v
           git add -A --force
           git commit -m "${COMMIT_MESSAGE}" || echo "No changes to commit"
