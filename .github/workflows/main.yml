@@ -82,21 +82,21 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ${{ env.THEME_PATH }}/package-lock.json
 
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      # - name: Get composer cache directory
+      #   id: composer-cache
+      #   run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache composer dependencies
-        if: ${{ !env.ACT }}
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+      # - name: Cache composer dependencies
+      #   if: ${{ !env.ACT }}
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ steps.composer-cache.outputs.dir }}
+      #     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+      #     restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install composer dependencies.
-        continue-on-error: true
-        run: composer install --prefer-dist --no-progress --no-dev -o -n
+      # - name: Install composer dependencies.
+      #   continue-on-error: true
+      #   run: composer install --prefer-dist --no-progress --no-dev -o -n
 
       - name: Install node dependencies and build.
         run: |
@@ -174,13 +174,14 @@ jobs:
 
       - name: Unzip Deploy Artifact
         run: |
-          tar -xf ${{ runner.temp }}/deploy-artifact.tar.gz
+          tar -xf ${{ runner.temp }}/deploy-artifact.tar.gz -C ${{ github.workspace }}
 
       - name: Configure git user
         run: |
-          git config user.name $USER_NAME
-          git config user.email $USER_EMAIL
+          git config --global user.name $USER_NAME
+          git config --global user.email $USER_EMAIL
           git config --global push.default current
+          git config --global init.defaultBranch main
 
   #     - name: Create gh_actions settings.php file
   #       run: |
@@ -191,25 +192,25 @@ jobs:
   #     - name: Add files to git
   #       run: git add -A --force
 
-      - name: Configure Remote Repository
-        working-directory: ${{ runner.temp }}
+      - name: Configure Remote Repository and commit changes
+        working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
           ls -la .
           git init
           git remote add origin "${{ env.DESTINATION_REPOSITORY }}"
           git remote -v
           git add -A --force
+          git commit -m "${COMMIT_MESSAGE}" || echo "No changes to commit"
+          echo ${DESTINATION_REPOSITORY_BRANCH}
 
       - name: Push the branch to the destination repository
         if: github.ref_type == 'branch'
-        working-directory: ${{ runner.temp }}
+        working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          git commit -m "${COMMIT_MESSAGE}" || echo "No changes to commit"
-          git push origin $DESTINATION_REPOSITORY_BRANCH
+          git push origin main:$DESTINATION_REPOSITORY_BRANCH
 
-  #     - name: Push the tag to the destination repository
-  #       if: github.ref_type == 'tag'
-  #       run: |
-  #         git config --global push.default current
-  #         git fetch --tags
-  #         git push --mirror tags/$DESTINATION_REPOSITORY_BRANCH
+      - name: Push the tag to the destination repository
+        if: github.ref_type == 'tag'
+        run: |
+          git fetch --tags
+          git push -u origin tags/$DESTINATION_REPOSITORY_BRANCH
