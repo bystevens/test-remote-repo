@@ -1,0 +1,16 @@
+docroot/core
+docroot/libraries
+docroot/modules/contrib
+docroot/profiles/contrib
+docroot/themes/contrib
+docroot/sites/*/files
+vendor/
+node_modules/
+.env
+.DS_Store
+.idea/
+*.log
+*.cache
+.phpcs-cache
+/.editorconfig
+/.gitattributes

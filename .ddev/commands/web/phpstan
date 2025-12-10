@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+## Description: Run PHPStan.
+## Usage: phpstan
+## Example: "ddev phpstan"
+
+composer phpstan

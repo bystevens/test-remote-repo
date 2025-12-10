@@ -1,0 +1,25 @@
+{
+  "name": "kinetic",
+  "version": "1.0.0",
+  "description": "Starter drupal theme.",
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "scripts": {
+    "build": "echo 'test build theme'",
+    "dev": "echo 'test build theme'",
+    "cr": "echo 'Clearing webpack cache\n' && rm -rf node_modules/.cache"
+  },
+  "author": "Elevated Third",
+  "license": "ISC",
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "not dead"
+  ],
+  "sideEffects": false,
+  "dependencies": {
+    "vite": "^6.3.5"
+  }
+}
