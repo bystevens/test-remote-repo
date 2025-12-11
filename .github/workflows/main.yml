@@ -21,6 +21,7 @@ jobs:
   test:
     name: Test Drupal Codebase
     runs-on: ubuntu-latest
+    if: github.ref_type != 'tag'
     steps:
       - uses: actions/checkout@v4
 
@@ -62,6 +63,7 @@ jobs:
   build:
     name: Test and Build project
     runs-on: ubuntu-latest
+    if: github.ref_type != 'tag'
     steps:
       - uses: actions/checkout@v4
 
@@ -124,7 +126,7 @@ jobs:
   deploy:
     name: Deploy Project to Remote Repository
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [test, build]
     env:
       DESTINATION_REPOSITORY_BRANCH: ${{ github.ref_name }}
       COMMIT_MESSAGE: Github Actions build ${{ github.run_number }}
@@ -188,11 +190,11 @@ jobs:
         if: github.ref_type == 'branch'
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          git push -u origin main:${DESTINATION_REPOSITORY_BRANCH} --force
+          git push -u origin "main:${DESTINATION_REPOSITORY_BRANCH}" --force
 
       - name: Push the tag to the destination repository
         if: github.ref_type == 'tag'
+        working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
           git fetch --tags
-          git tag ${DESTINATION_REPOSITORY_BRANCH}
-          git push -u origin tags/${DESTINATION_REPOSITORY_BRANCH} --force
+          git push -u origin "tags/${DESTINATION_REPOSITORY_BRANCH}" --force
