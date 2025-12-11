@@ -186,7 +186,7 @@ jobs:
       - name: Configure Remote Repository and commit changes
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          git remote set-url origin "${{ env.DESTINATION_REPOSITORY }}"
+          git remote add remote "${{ env.DESTINATION_REPOSITORY }}"
           git remote -v
           git add -A --force > /dev/null
           git commit -m "${COMMIT_MESSAGE}" || echo "No changes to commit"
@@ -196,11 +196,11 @@ jobs:
         if: github.ref_type == 'branch'
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          git push -u origin "main:${DESTINATION_REPOSITORY_BRANCH}" --force
+          git push -u remote "HEAD:refs/heads/${DESTINATION_REPOSITORY_BRANCH}" --force
 
       - name: Push the tag to the destination repository
         if: github.ref_type == 'tag'
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
           git fetch --tags
-          git push -u origin "tags/${{ env.DESTINATION_REPOSITORY_BRANCH }}" --force
+          git push -u remote "tags/${{ env.DESTINATION_REPOSITORY_BRANCH }}" --force
