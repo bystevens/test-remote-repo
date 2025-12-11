@@ -60,5 +60,5 @@ runs:
 
     - name: Test SSH connection.
       run: |
-        ssh -T git@github.com
+        ssh -Tv git@github.com
       shell: bash
