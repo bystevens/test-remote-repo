@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+## Description: Run PHP CodeSniffer.
+## Usage: phpcs
+## Example: "ddev phpcs"
+
+composer phpcs

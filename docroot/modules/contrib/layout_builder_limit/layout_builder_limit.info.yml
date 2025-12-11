@@ -1,0 +1,12 @@
+name: 'Layout Builder Limit'
+type: module
+description: 'Provides limits to components in layout builder sections and regions.'
+core_version_requirement: ^10.1 || ^11
+package: 'Layout Builder'
+dependencies:
+  - drupal:layout_builder
+
+# Information added by Drupal.org packaging script on 2024-08-07
+version: '1.0.0-beta5'
+project: 'layout_builder_limit'
+datestamp: 1722999727
