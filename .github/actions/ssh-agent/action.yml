@@ -56,9 +56,11 @@ runs:
     - name: Start ssh-agent.
       run: |
         ssh-agent -a ${{ env.SSH_AUTH_SOCK }}
+        ssh-add ~/.ssh/gh_actions
       shell: bash
 
     - name: Test SSH connection.
       run: |
+        ls -la ~/.ssh
         ssh -Tv git@github.com
       shell: bash
