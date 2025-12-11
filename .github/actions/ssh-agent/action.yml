@@ -42,6 +42,11 @@ runs:
         ssh-keyscan -t rsa ${{ env.REMOTE_GIT_HOST }} >> ~/.ssh/known_hosts
       shell: bash
 
+    - name: Test SSH connection.
+      run: |
+        ssh -T git@github.com
+      shell: bash
+
     # Required for passphrase protected rsa key.
     # - name: Create ask_pass file.
     #   env:
