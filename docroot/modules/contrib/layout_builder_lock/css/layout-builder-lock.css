@@ -1,0 +1,6 @@
+/* Using :not(b) is slightly more specific (0 1 1) than a single class selector but less
+   specific than 2 class selectors (0 2 0). The element is not likely to be a <b>. */
+.layout-builder-block-locked:not(b) {
+  padding: 1.5em;
+  cursor: default;
+}
