@@ -18,46 +18,46 @@ env:
   DESTINATION_REPOSITORY: 'git@github.com:bystevens/test-remote-repo.git'
 
 jobs:
-  # test:
-  #   name: Test Drupal Codebase
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  test:
+    name: Test Drupal Codebase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Enable Debug Logging
-  #       run: echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
+      - name: Enable Debug Logging
+        run: echo "ACTIONS_STEP_DEBUG=true" >> $GITHUB_ENV
 
-  #     - name: Install PHP
-  #       uses: shivammathur/setup-php@v2
-  #       with:
-  #         php-version: ${{ env.PHP_VERSION }}
-  #         tools: composer:${{ env.COMPOSER_VERSION }}
-  #         extensions: gd, imagick
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:${{ env.COMPOSER_VERSION }}
+          extensions: gd, imagick
 
-  #     - name: Validate composer.json
-  #       run: composer validate
+      - name: Validate composer.json
+        run: composer validate
 
-  #     - name: Get composer cache directory
-  #       id: composer-cache
-  #       run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-  #     - name: Cache composer dependencies
-  #       if: ${{ !env.ACT }}
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ${{ steps.composer-cache.outputs.dir }}
-  #         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-  #         restore-keys: ${{ runner.os }}-composer-
+      - name: Cache composer dependencies
+        if: ${{ !env.ACT }}
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
-  #     - name: Install composer dependencies and dev dependencies.
-  #       continue-on-error: true
-  #       run: composer install --prefer-dist --no-progress -o -n
+      - name: Install composer dependencies and dev dependencies.
+        continue-on-error: true
+        run: composer install --prefer-dist --no-progress -o -n
 
-  #     - name: Run PHP Stan analysis
-  #       run: composer phpstan
+      - name: Run PHP Stan analysis
+        run: composer phpstan
 
-  #     - name: Run PHPCS analysis
-  #       run: composer phpcs
+      - name: Run PHPCS analysis
+        run: composer phpcs
 
   build:
     name: Test and Build project
@@ -150,21 +150,6 @@ jobs:
         env:
           SSH_AUTH_SOCK: ${{ env.SSH_AUTH_SOCK }}
 
-      # - name: Clean directory
-      #   run: rm -rf gh
-
-      # - name: Clone the destination repository
-      #   run: git clone --bare ${{ env.DOTENV_DESTINATION_REPOSITORY }} mirror
-
-  #     - name: Checkout a branch based on the source branch
-  #       run: |
-  #         git config user.name $USER_NAME
-  #         git config user.email $USER_EMAIL
-  #         git remote add mirror "${REMOTE_REPO_URL}"
-  #         git checkout $DESTINATION_REPOSITORY_BRANCH || git checkout -B $DESTINATION_REPOSITORY_BRANCH
-  #         git rm -rf .
-  #         git clean -fxd
-
       - name: Download deploy artifact
         uses: actions/download-artifact@v4
         with:
@@ -182,23 +167,20 @@ jobs:
           git config --global push.default current
           git config --global init.defaultBranch main
 
-  #     - name: Create gh_actions settings.php file
-  #       run: |
-  #         echo "<?php \$settings['deployment_identifier'] = '${DESTINATION_REPOSITORY_BRANCH}';" > settings.gh_actions.php
-  #         mv settings.gh_actions.php ${{ github.workspace }}/${{ env.WEBROOT }}/sites/default/
-  #         chmod 644 ${{ github.workspace }}/${{ env.WEBROOT }}/sites/default/settings.gh_actions.php
-
-  #     - name: Add files to git
-  #       run: git add -A --force
+      - name: Create gh_actions settings.php file
+        working-directory: ${{ github.workspace }}/deploy-artifact
+        run: |
+          echo "<?php \$settings['deployment_identifier'] = '${DESTINATION_REPOSITORY_BRANCH}';" > settings.gh_actions.php
+          mv settings.gh_actions.php ${{ github.workspace }}/deploy-artifact/${{ env.WEBROOT }}/sites/default/
+          chmod 644 ${{ github.workspace }}/deploy-artifact/${{ env.WEBROOT }}/sites/default/settings.gh_actions.php
 
       - name: Configure Remote Repository and commit changes
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          ls -la .
           git init
           git remote set-url origin "${{ env.DESTINATION_REPOSITORY }}"
           git remote -v
-          git add -A --force
+          git add -A --force > /dev/null
           git commit -m "${COMMIT_MESSAGE}" || echo "No changes to commit"
           echo ${DESTINATION_REPOSITORY_BRANCH}
 
@@ -206,10 +188,11 @@ jobs:
         if: github.ref_type == 'branch'
         working-directory: ${{ github.workspace }}/deploy-artifact
         run: |
-          git push origin main:${DESTINATION_REPOSITORY_BRANCH} --force
+          git push -u origin main:${DESTINATION_REPOSITORY_BRANCH} --force
 
       - name: Push the tag to the destination repository
         if: github.ref_type == 'tag'
         run: |
           git fetch --tags
+          git tag ${DESTINATION_REPOSITORY_BRANCH}
           git push -u origin tags/${DESTINATION_REPOSITORY_BRANCH} --force
